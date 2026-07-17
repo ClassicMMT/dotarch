@@ -1,0 +1,37 @@
+#!/bin/bash
+# move-all-to-workspace — move EVERY window on the current workspace to <target>,
+# then follow (switch focus to the target workspace).
+#
+# Usage:  move-all-to-workspace <workspace-number>
+# Bound in ~/.config/hypr/bindings.conf to SUPER+CTRL+ALT+[1-9,0].
+#
+# Windows are moved with movetoworkspacesilent (no per-window visual thrash),
+# batched into a single hyprctl call, then we switch to the target so you land
+# where your windows now are. No-op if already on the target or nothing to move.
+
+set -euo pipefail
+
+target="${1:?usage: move-all-to-workspace <workspace-number>}"
+
+current=$(hyprctl activeworkspace -j | jq -r '.id')
+
+# Already there — nothing to do.
+[[ "$current" == "$target" ]] && exit 0
+
+# All windows on the current workspace, in reading order (left-to-right, top-to-
+# bottom) so dwindle rebuilds a simple row/column the same as it was.
+mapfile -t addrs < <(hyprctl clients -j | jq -r --argjson ws "$current" \
+  '[.[] | select(.workspace.id == $ws)] | sort_by(.at[0], .at[1]) | .[].address')
+
+# Empty workspace — nothing to move.
+[[ ${#addrs[@]} -eq 0 ]] && exit 0
+
+# Move them all silently in one batched dispatch.
+batch=""
+for a in "${addrs[@]}"; do
+  batch+="dispatch movetoworkspacesilent $target,address:$a; "
+done
+hyprctl --batch "$batch"
+
+# Follow the windows to the target workspace.
+hyprctl dispatch workspace "$target"

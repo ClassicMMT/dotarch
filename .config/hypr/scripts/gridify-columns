@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""Equalize columns by snapping every vertical divider onto an even grid.
+
+Bound to SUPER+E. The model, kept deliberately simple:
+  1. Count the columns = number of distinct vertical dividers + 1 (i.e. the most
+     side-by-side splits you'd cross on any horizontal line through the screen).
+  2. Put each divider on an even grid, so every column is 1/N of the width.
+
+A divider is the vertical gap shared by the windows on its two sides. Moving one
+means resizing a window whose edge sits on it: `resizewindowpixel <dx> 0` moves
+that window's nearest vertical boundary by dx (rightward for +dx). Which divider
+a given window controls depends on dwindle's hidden tree, so for each divider we
+try the windows touching it and keep whichever actually moves it (measured;
+reverted otherwise). Vertical stacks follow their column -- only widths change.
+
+BOUNDED: a fixed number of passes, so it always terminates in well under a second
+and never thrashes (the bug this replaced).
+
+Known dwindle limitation: a divider with multi-window groups on BOTH sides (e.g.
+a root split between a left pair and a right pair) cannot be moved by resizing
+any single window -- only by dragging it with the mouse. Such a divider is left
+where it is; every other column still equalizes around it. Normal rows and
+singly-nested layouts have no such divider and grid exactly.
+
+Args: optional workspace id (else active). --debug prints the grid + per-pass state.
+"""
+import json
+import subprocess
+import sys
+
+TOL = 6
+CLUSTER = 28      # px: edges this close are the same divider (absorbs the gap)
+PASSES = 6
+DEBUG = "--debug" in sys.argv
+
+
+def hc(*args):
+    return json.loads(subprocess.check_output(["hyprctl", *args, "-j"]))
+
+
+def tiled(ws_id):
+    return [c for c in hc("clients")
+            if c["workspace"]["id"] == ws_id
+            and not c["floating"] and not c["fullscreen"] and c["mapped"]]
+
+
+def grid(cs):
+    """Return (L0, Lm, dividers): outer x-bounds and internal divider x's."""
+    lefts = [c["at"][0] for c in cs]
+    rights = [c["at"][0] + c["size"][0] for c in cs]
+    L0, Lm = min(lefts), max(rights)
+    pts = sorted([r for r in rights if r < Lm - CLUSTER] +
+                 [l for l in lefts if l > L0 + CLUSTER])
+    clusters = []
+    for x in pts:
+        if clusters and x - clusters[-1][-1] <= CLUSTER:
+            clusters[-1].append(x)
+        else:
+            clusters.append([x])
+    return L0, Lm, [sum(cl) / len(cl) for cl in clusters]
+
+
+def nudge(addr, delta):
+    if delta:
+        subprocess.run(["hyprctl", "--batch",
+                        f"dispatch resizewindowpixel {delta} 0,address:{addr}"],
+                       check=False, stdout=subprocess.DEVNULL)
+
+
+def main():
+    pos = [a for a in sys.argv[1:] if not a.startswith("-")]
+    ws_id = int(pos[0]) if pos else hc("activeworkspace")["id"]
+
+    cs = tiled(ws_id)
+    if len(cs) < 2:
+        print("nothing to equalize")
+        return
+    L0, Lm, divs = grid(cs)
+    n = len(divs) + 1
+    targets = [round(L0 + (j + 1) * (Lm - L0) / n) for j in range(len(divs))]
+    if DEBUG:
+        print(f"{n} columns; dividers {[round(d) for d in divs]} -> {targets}")
+
+    for p in range(PASSES):
+        cs = tiled(ws_id)
+        L0, Lm, divs = grid(cs)
+        if len(divs) + 1 != n:               # window opened/closed; stop cleanly
+            break
+        if max((abs(targets[j] - divs[j]) for j in range(len(divs))), default=0) <= TOL:
+            if DEBUG:
+                print(f"converged after {p} pass(es)")
+            break
+        for j, line in enumerate(divs):
+            d = round(targets[j] - line)
+            if abs(d) <= TOL:
+                continue
+            cands = [c for c in cs
+                     if abs(c["at"][0] + c["size"][0] - line) <= CLUSTER
+                     or abs(c["at"][0] - line) <= CLUSTER]
+            for c in cands:
+                nudge(c["address"], d)
+                nd = grid(tiled(ws_id))[2]
+                if len(nd) == len(divs) and abs(targets[j] - nd[j]) <= abs(d) - 2:
+                    break                    # this window moved divider j; keep
+                nudge(c["address"], -d)       # wrong window; undo, try the next
+
+    divs = grid(tiled(ws_id))[2]
+    resid = max((abs(targets[j] - divs[j]) for j in range(min(len(divs), len(targets)))),
+                default=0)
+    if resid <= TOL:
+        print(f"gridified: {len(divs) + 1} equal columns")
+    else:
+        print(f"gridified {len(divs) + 1} columns; one divider is unmovable "
+              f"(dwindle limit), off by {round(resid)}px")
+
+
+if __name__ == "__main__":
+    main()

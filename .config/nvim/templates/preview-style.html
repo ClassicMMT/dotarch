@@ -1,0 +1,106 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" $if(lang)$ lang="$lang$" xml:lang="$lang$" $endif$>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown-light.min.css"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css" />
+    <style>
+      html {
+        color-scheme: light;
+      }
+      body {
+        background: #ffffff;
+      }
+      /* cap content width and centre it so the preview doesn't stretch
+         full-screen when browser is maximised */
+      .markdown-body {
+        max-width: 980px;
+        margin: 0 auto;
+      }
+      /* copy button for code blocks */
+      .markdown-body pre {
+        position: relative;
+      }
+      .markdown-body pre .copy-btn {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        padding: 3px 8px;
+        font: 12px/1.4 inherit;
+        color: #24292f;
+        background: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+      }
+      .markdown-body pre:hover .copy-btn {
+        opacity: 1;
+      }
+      .markdown-body pre .copy-btn:hover {
+        background: #eaeef2;
+      }
+      .markdown-body pre .copy-btn.copied {
+        color: #1a7f37;
+        border-color: #1a7f37;
+      }
+    </style>
+    $if(math)$ $math$ $endif$ $for(header-includes)$ $header-includes$ $endfor$
+  </head>
+  <body class="markdown-body" style="padding: 30px">
+    $if(title)$
+    <h1>$title$</h1>
+    $endif$ $body$
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+    <script>
+      // adds a copy button to every code block
+      document.querySelectorAll(".markdown-body pre").forEach(function (pre) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "copy-btn";
+        btn.textContent = "Copy";
+        btn.addEventListener("click", function () {
+          var code = pre.querySelector("code");
+          var text = code ? code.innerText : "";
+          var flash = function () {
+            btn.textContent = "Copied!";
+            btn.classList.add("copied");
+            setTimeout(function () {
+              btn.textContent = "Copy";
+              btn.classList.remove("copied");
+            }, 1500);
+          };
+          function legacyCopy() {
+            var ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand("copy");
+              flash();
+            } catch (e) {}
+            document.body.removeChild(ta);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(flash, legacyCopy);
+          } else {
+            legacyCopy();
+          }
+        });
+        pre.appendChild(btn);
+      });
+    </script>
+  </body>
+</html>

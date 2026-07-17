@@ -1,0 +1,10 @@
+# return to lazygit without prompt post edit
+promptToReturnFromSubprocess: false
+
+gui:
+  theme:
+    selectedLineBgColor:
+      - "#283457"
+
+os:
+  editPreset: "nvim"
