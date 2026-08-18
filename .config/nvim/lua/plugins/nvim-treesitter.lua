@@ -215,7 +215,11 @@ return {
           return
         end
         repeat
-          sib = forward and sib:next_named_sibling() or sib:prev_named_sibling()
+          if forward then
+            sib = sib:next_named_sibling()
+          else
+            sib = sib:prev_named_sibling()
+          end
         until not sib or is_def(sib)
         move_to(sib)
       end
