@@ -7,7 +7,7 @@ Bound to SUPER+E. The model, kept deliberately simple:
   2. Put each divider on an even grid, so every column is 1/N of the width.
 
 A divider is the vertical gap shared by the windows on its two sides. Moving one
-means resizing a window whose edge sits on it: `resizewindowpixel <dx> 0` moves
+means resizing a window whose edge sits on it: `window.resize {x=dx, y=0}` moves
 that window's nearest vertical boundary by dx (rightward for +dx). Which divider
 a given window controls depends on dwindle's hidden tree, so for each divider we
 try the windows touching it and keep whichever actually moves it (measured;
@@ -62,8 +62,9 @@ def grid(cs):
 
 def nudge(addr, delta):
     if delta:
-        subprocess.run(["hyprctl", "--batch",
-                        f"dispatch resizewindowpixel {delta} 0,address:{addr}"],
+        subprocess.run(["hyprctl", "dispatch",
+                        f'hl.dsp.window.resize({{ x = {delta}, y = 0, '
+                        f'relative = true, window = "address:{addr}" }})'],
                        check=False, stdout=subprocess.DEVNULL)
 
 
