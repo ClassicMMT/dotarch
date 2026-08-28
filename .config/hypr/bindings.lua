@@ -12,6 +12,8 @@ o.bind("SUPER + semicolon", "Toggle window split", hl.dsp.layout("togglesplit"))
 hl.unbind("SUPER + SLASH")
 hl.unbind("SUPER + ALT + SLASH")
 
+hl.unbind("SUPER + SHIFT + E")
+
 -- Unbind default arrow key window management (now handled by HJKL)
 hl.unbind("SUPER + LEFT")
 hl.unbind("SUPER + RIGHT")
