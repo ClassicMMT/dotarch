@@ -17,12 +17,20 @@ alias cr="claude --resume"
 alias cl="clear"
 alias nv="nvim"
 alias kd="git kdt" # kitten diff
+alias g="git"
 alias gs="git status"
 alias gf="git fetch"
 alias gl="git log"
 alias gll="git log --oneline"
-alias cdd="cd ~/repos/datamasque"
-alias cda="cd ~/repos/datamasque-automation"
+alias gc="git commit -m"
+alias dot="cd ~/.dotfiles"
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+alias mup="MISE_MINIMUM_RELEASE_AGE=0 mise up"
+
 [[ -f ~/.dm_zshrc ]] && source ~/.dm_zshrc
 
 
