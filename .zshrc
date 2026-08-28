@@ -41,10 +41,11 @@ export VISUAL="nvim"
 export EDITOR="nvim"
 
 # fix compdef error
+fpath+=~/.zfunc
 autoload -Uz compinit && compinit
 
 # Enable Vi mode in zsh - run brew install zsh-vi-mode
-source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+source /home/linuxbrew/.linuxbrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
 ZVM_SYSTEM_CLIPBOARD_ENABLED=true
 
@@ -57,9 +58,6 @@ function zvm_clipboard_copy_buffer() {
   trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
   print -rn -- "$trimmed" | eval "$ZVM_CLIPBOARD_COPY_CMD" >/dev/null 2>&1
 }
-
-# Terminal theme
-source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 
 # autosuggestions -- install by running: brew install zsh-autosuggestions
 source /home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -115,7 +113,5 @@ function y() {
 	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
 	rm -f -- "$tmp"
 }
-
-fpath+=~/.zfunc; autoload -Uz compinit; compinit
 
 zstyle ':completion:*' menu select
