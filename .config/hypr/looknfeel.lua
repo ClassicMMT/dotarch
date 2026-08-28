@@ -1,0 +1,42 @@
+-- Change the default Omarchy look'n'feel
+
+-- https://wiki.hyprland.org/Configuring/Variables/#general
+hl.config({
+  general = {
+    -- No gaps between windows or borders
+    gaps_in = 4,
+    gaps_out = 8,
+    -- border_size = 0
+
+    -- Use master layout instead of dwindle
+    -- layout = master
+    layout = "dwindle",
+  },
+})
+
+-- https://wiki.hyprland.org/Configuring/Variables/#decoration
+hl.config({
+  decoration = {
+    -- Use round window corners
+    rounding = 12,
+    inactive_opacity = 0.9,
+    -- blur {
+    --   enabled = true
+    --   size = 8
+    --   passes = 3
+    -- }
+    -- shadow {
+    --   enabled = true
+    --   range = 12
+    --   render_power = 4
+    -- }
+  },
+})
+
+hl.animation({ leaf = "fadeSwitch", enabled = true, speed = 5.39, bezier = "easeOutQuint" })
+
+-- https://wiki.hypr.land/Configuring/Variables/#layout
+-- layout {
+    -- Avoid overly wide single-window layouts on wide screens
+    -- single_window_aspect_ratio = 1 1
+-- }
