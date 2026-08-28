@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/goodroot/hyprwhspr/main/share/config.schema.json",
+  "use_hypr_bindings": true,
+  "transcription_backend": "onnx-asr",
+  "audio_ducking": true,
+  "keepalive_stream": true,
+  "audio_device_id": "Digital Microphone",
+  "word_overrides": {
+    "hyper whisper": "hyprwhspr",
+    "omachi": "omarchy",
+    "umachi": "omarchy",
+    "my machi": "omarchy",
+    "a machi": "omarchy",
+    "simlink": "symlink",
+    "dot files": "dotfiles"
+  }
+}
