@@ -50,3 +50,6 @@ end)
 
 -- Load LSP config
 require "configs.lspconfig"
+
+-- Skeleton folding
+require "configs.folds"

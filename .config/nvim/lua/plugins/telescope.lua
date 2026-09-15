@@ -67,7 +67,6 @@ return {
       "--line-number",
       "--column",
       "--smart-case",
-      "--no-ignore",
       "--glob=!*.ipynb",
       "--glob=!*.json",
       "--glob=!*.log",
@@ -82,7 +81,7 @@ return {
 
     conf.pickers = {
       find_files = {
-        find_command = { "rg", "--files", "--no-ignore", "--glob", "!.git/*" },
+        find_command = { "rg", "--files", "--glob", "!.git/*" },
       },
     }
 

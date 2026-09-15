@@ -1,11 +1,40 @@
+local function base_rev()
+  local refs = vim.fn.systemlist {
+    "git", "for-each-ref", "--no-contains", "HEAD", "--format=%(refname)", "refs/heads/",
+  }
+  if vim.v.shell_error ~= 0 or #refs == 0 then
+    return "origin/HEAD"
+  end
+
+  local cmd = vim.list_extend({ "git", "rev-list", "--boundary", "HEAD", "--not" }, refs)
+  local out = vim.fn.systemlist(cmd)
+  if vim.v.shell_error ~= 0 then
+    return "origin/HEAD"
+  end
+
+  for _, line in ipairs(out) do
+    if line:sub(1, 1) == "-" then
+      return line:sub(2)
+    end
+  end
+
+  return "origin/HEAD"
+end
+
 local function toggle(open)
   return function()
     if require("diffview.lib").get_current_view() then
       vim.cmd "DiffviewClose"
     else
-      vim.cmd(open)
+      vim.cmd(type(open) == "function" and open() or open)
     end
   end
+end
+
+local function toggle_base(template)
+  return toggle(function()
+    return string.format(template, base_rev())
+  end)
 end
 
 local function equalize()
@@ -41,10 +70,16 @@ return {
   dependencies = { "nvim-lua/plenary.nvim" },
   keys = {
     { "<leader>dd", toggle "DiffviewOpen", desc = "Toggle diffview working tree" },
-    { "<leader>dv", toggle "DiffviewOpen origin/HEAD...HEAD --imply-local", desc = "Toggle diffview changes" },
-    { "<leader>dh", toggle "DiffviewFileHistory --range=origin/HEAD..HEAD", desc = "Toggle diffview commits" },
+    { "<leader>dv", toggle_base "DiffviewOpen %s...HEAD --imply-local", desc = "Toggle diffview changes" },
+    { "<leader>dh", toggle_base "DiffviewFileHistory --range=%s..HEAD", desc = "Toggle diffview commits" },
   },
   opts = {
+    file_history_panel = {
+      win_config = {
+        position = "left",
+        width = 40,
+      },
+    },
     keymaps = {
       view = { equalize_map },
       file_panel = { equalize_map },

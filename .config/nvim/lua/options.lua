@@ -32,6 +32,16 @@ vim.filetype.add { extension = { typ = "typst" } }
 -- performance drain on large files (evaluated per-line on every change)
 options.foldenable = false
 
+options.diffopt = {
+  "internal",
+  "filler",
+  "closeoff",
+  "indent-heuristic",
+  "algorithm:histogram",
+  "inline:word",
+  "linematch:200",
+}
+
 -- inlay hints
 vim.lsp.inlay_hint.enable(true)
 

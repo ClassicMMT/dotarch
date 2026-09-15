@@ -108,14 +108,27 @@ return {
 
       -- Tree navigation across definitions (functions / methods / classes) --
 
-      local DEF_PAT = { "function", "method", "class", "decorated" }
+      local DEFINITION_TYPE_FRAGMENTS = {
+        "function",
+        "method",
+        "class",
+        "decorated",
+        "impl_item",
+        "trait_item",
+        "struct_item",
+        "enum_item",
+        "union_item",
+        "mod_item",
+        "type_item",
+        "macro_definition",
+      }
       local function is_def(node)
         if not node or not node:named() then
           return false
         end -- skip anonymous tokens (the `class`/`def` keywords)
-        local t = node:type()
-        for _, p in ipairs(DEF_PAT) do
-          if t:find(p) then
+        local node_type = node:type()
+        for _, fragment in ipairs(DEFINITION_TYPE_FRAGMENTS) do
+          if node_type:find(fragment) then
             return true
           end
         end
