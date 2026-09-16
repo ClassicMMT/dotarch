@@ -265,3 +265,7 @@ end, { desc = "telescope nvchad themes" })
 -- git
 map("n", "<leader>gc", "<cmd>Telescope git_commits<CR>", { desc = "git commits" })
 map("n", "<leader>gs", "<cmd>Telescope git_status<CR>", { desc = "git status" })
+
+map("n", "<leader>gr", function()
+  require("configs.pyo3_boundary").goto_rust_definition()
+end, { desc = "Go to Rust definition (pyo3)" })

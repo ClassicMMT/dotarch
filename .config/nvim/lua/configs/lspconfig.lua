@@ -1,4 +1,5 @@
 local nvlsp = require "nvchad.configs.lspconfig"
+local pyo3_boundary = require "configs.pyo3_boundary"
 local map = vim.keymap.set
 
 vim.o.winborder = "rounded"
@@ -78,24 +79,6 @@ vim.lsp.config("lua_ls", {
 })
 vim.lsp.enable "lua_ls"
 
-local function discover_extra_paths(start_dir)
-  if not start_dir or start_dir == "" then
-    return {}
-  end
-  local git = vim.fs.find(".git", { upward = true, path = start_dir, limit = 1 })[1]
-  local top = git and vim.fs.dirname(git) or start_dir
-  local paths = {}
-  for name, kind in vim.fs.dir(top) do
-    if kind == "directory" then
-      local dir = top .. "/" .. name
-      if vim.uv.fs_stat(dir .. "/pyproject.toml") or vim.uv.fs_stat(dir .. "/setup.py") then
-        table.insert(paths, dir)
-      end
-    end
-  end
-  return paths
-end
-
 -- jedi-language-server reads these from initializationOptions (NOT workspace/configuration),
 -- so they must go under `init_options`, with top-level camelCase keys.
 local jedi_init_options = {
@@ -116,7 +99,7 @@ vim.lsp.config("jedi_language_server", {
   init_options = jedi_init_options,
   before_init = function(params, config)
     local opts = vim.deepcopy(jedi_init_options)
-    opts.workspace = { extraPaths = discover_extra_paths(config.root_dir) }
+    opts.workspace = { extraPaths = pyo3_boundary.package_roots(config.root_dir) }
     params.initializationOptions = opts
   end,
 })
