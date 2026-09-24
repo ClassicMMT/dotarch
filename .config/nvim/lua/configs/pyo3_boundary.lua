@@ -31,18 +31,50 @@ function M.package_roots(start_dir)
   return paths
 end
 
+function M.ranked_hits(symbol)
+  local pattern = string.format([[name = "%s"|(fn|struct|enum|trait) %s\b]], symbol, symbol)
+  local lines = vim.fn.systemlist { "rg", "--vimgrep", "--type", "rust", "-e", pattern }
+  if vim.v.shell_error ~= 0 or #lines == 0 then
+    return {}
+  end
+
+  local marker = string.format('name = "%s"', symbol)
+  local exported, other = {}, {}
+  for _, line in ipairs(lines) do
+    table.insert(line:find(marker, 1, true) and exported or other, line)
+  end
+
+  return vim.list_extend(exported, other)
+end
+
 function M.goto_rust_definition()
   local symbol = vim.fn.expand "<cword>"
   if symbol == "" then
     return
   end
 
-  require("telescope.builtin").grep_string {
-    search = string.format([[name = "%s"|fn %s\b]], symbol, symbol),
-    use_regex = true,
-    additional_args = { "--type", "rust" },
-    prompt_title = "Rust definition: " .. symbol,
-  }
+  local hits = M.ranked_hits(symbol)
+  if #hits == 0 then
+    vim.notify("No Rust definition found for " .. symbol, vim.log.levels.WARN)
+    return
+  end
+
+  local pickers = require "telescope.pickers"
+  local finders = require "telescope.finders"
+  local make_entry = require "telescope.make_entry"
+  local conf = require("telescope.config").values
+
+  pickers
+    .new({}, {
+      prompt_title = "Rust definition: " .. symbol,
+      finder = finders.new_table {
+        results = hits,
+        entry_maker = make_entry.gen_from_vimgrep {},
+      },
+      sorter = conf.generic_sorter {},
+      previewer = conf.grep_previewer {},
+    })
+    :find()
 end
 
 return M
