@@ -47,6 +47,13 @@ o.bind("SUPER + SHIFT + L", "Swap window to the right", hl.dsp.window.swap({ dir
 o.bind("SUPER + SHIFT + K", "Swap window up", hl.dsp.window.swap({ direction = "u" }))
 o.bind("SUPER + SHIFT + J", "Swap window down", hl.dsp.window.swap({ direction = "d" }))
 
+-- Resize windows with SUPER + ALT + HJKL
+hl.unbind("SUPER + ALT + K")
+o.bind("SUPER + ALT + H", "Shrink window width", hl.dsp.window.resize({ x = -100, y = 0, relative = true }))
+o.bind("SUPER + ALT + L", "Grow window width", hl.dsp.window.resize({ x = 100, y = 0, relative = true }))
+o.bind("SUPER + ALT + K", "Shrink window height", hl.dsp.window.resize({ x = 0, y = -100, relative = true }))
+o.bind("SUPER + ALT + J", "Grow window height", hl.dsp.window.resize({ x = 0, y = 100, relative = true }))
+
 
 -- equalise column widths on the focused monitor
 o.bind("SUPER + E", "Equalize columns", "~/.config/hypr/scripts/gridify-columns")
