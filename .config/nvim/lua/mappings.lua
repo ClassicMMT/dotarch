@@ -160,6 +160,13 @@ end, { desc = "Toggle Inlay Hints" })
 -- Buffer navigation
 map("n", "<leader>b", ":b#<CR>", { desc = "Jump to Previous Buffer" })
 
+-- put each sentence on its own line
+vim.api.nvim_create_user_command("SplitSentences", function(opts)
+  vim.cmd(opts.line1 .. "," .. opts.line2 .. [[s/\v([.!?])\s+/\1\r/ge]])
+end, { range = "%" })
+map("n", "gS", "<cmd>SplitSentences<CR>", { desc = "Split sentences onto new lines (file)" })
+map("x", "gS", ":SplitSentences<CR>", { desc = "Split sentences onto new lines (selection)" })
+
 -- END OF MY MAPPINGS --
 
 -- Modified nvchad.mappings
