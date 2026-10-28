@@ -24,6 +24,7 @@ alias gl="git log"
 alias gll="git log --oneline"
 alias gc="git commit -m"
 alias dot="cd ~/.dotfiles"
+alias libre="libreoffice"
 
 alias ..="cd .."
 alias ...="cd ../.."

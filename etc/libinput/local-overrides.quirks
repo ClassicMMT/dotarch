@@ -1,0 +1,6 @@
+# keyd sends the built-in keyboard events from a virtual keyboard.
+# libinput thinks that this keyboard is external, so disable-while-typing does not work.
+[keyd virtual keyboard]
+MatchUdevType=keyboard
+MatchName=keyd virtual keyboard
+AttrKeyboardIntegration=internal

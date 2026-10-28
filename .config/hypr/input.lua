@@ -4,12 +4,10 @@ hl.config({
   input = {
     left_handed = true,
 
-
     -- Use multiple keyboard layouts and switch between them with Left Alt + Right Alt
     -- kb_layout = us,dk,eu
     kb_layout = "us",
     kb_options = "compose:caps", -- ,grp:alts_toggle
-
 
     -- Change speed of keyboard repeat
     repeat_rate = 40,
@@ -17,9 +15,6 @@ hl.config({
 
     -- Start with numlock on by default
     numlock_by_default = true,
-
-    -- Increase sensitivity for mouse/trackpad (default: 0)
-    -- sensitivity = 0.35
 
     -- Control the speed of your scrolling
     scroll_factor = 2.5,
