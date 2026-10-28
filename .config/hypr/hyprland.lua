@@ -33,3 +33,5 @@ o.window({ title = ".*sharing your screen.*" }, { workspace = "special:hidden si
 -- float the aws vpn in top-right corner
 o.window("AWS VPN Client", { float = true })
 o.window("AWS VPN Client", { move = { "monitor_w-window_w-20", "40" } })
+
+o.window("org.gnome.Evince", { tag = "-floating-window" })
