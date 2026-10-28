@@ -1,0 +1,6 @@
+# Keep an idle rust-analyzer for 1 hour after the last nvim disconnects.
+instance_timeout = 3600
+
+# Pass only what rust-analyzer needs. Per-window variables (KITTY_*, NVIM)
+# would make lspmux start a new rust-analyzer for every nvim session.
+pass_environment = ["PATH", "HOME", "USER", "LD_LIBRARY_PATH", "CARGO_*", "RUSTUP_*", "RUSTC*", "RUST_*"]
